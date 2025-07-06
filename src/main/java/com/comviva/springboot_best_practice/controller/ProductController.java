@@ -1,5 +1,6 @@
 package com.comviva.springboot_best_practice.controller;
 
+import com.comviva.springboot_best_practice.dto.APIResponse;
 import com.comviva.springboot_best_practice.dto.ProductRequestDto;
 import com.comviva.springboot_best_practice.dto.ProductResponseDto;
 import com.comviva.springboot_best_practice.service.ProductServiceImpl;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RequestMapping("/products")
 public class ProductController {
 
+    public static final String SUCCESS ="Success";
     private final ProductServiceImpl productService;
 
     public ProductController(ProductServiceImpl productService) {
@@ -22,26 +24,45 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDto> createNewProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
-        ProductResponseDto newProduct = productService.createNewProduct(productRequestDto);
-        return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+    public ResponseEntity<APIResponse> createNewProduct(@RequestBody @Valid ProductRequestDto productRequestDto) {
+        ProductResponseDto productResponseDto = productService.createNewProduct(productRequestDto);
+        APIResponse<ProductResponseDto> responseDto = APIResponse.<ProductResponseDto>builder()
+                .status(SUCCESS)
+                .results(productResponseDto)
+                .build();
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getProducts() {
+    public ResponseEntity<APIResponse> getProducts() {
+
         List<ProductResponseDto> products = productService.getProducts();
-        return new ResponseEntity<>(products, HttpStatus.OK);
+        APIResponse<List<ProductResponseDto>> responseDto = APIResponse.<List<ProductResponseDto>>builder()
+                .status(SUCCESS)
+                .results(products)
+                .build();
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto>getProductById(@PathVariable long id){
+    public ResponseEntity<APIResponse>getProductById(@PathVariable long id){
         ProductResponseDto productById = productService.getProductById(id);
-        return new ResponseEntity<>(productById,HttpStatus.OK);
+        APIResponse<ProductResponseDto> responseDto = APIResponse.<ProductResponseDto>builder()
+                .status(SUCCESS)
+                .results(productById)
+                .build();
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
+
     @GetMapping("/productType")
-    public ResponseEntity<Map<String,List<ProductResponseDto>>>getProductsBytypes(){
+    public ResponseEntity<APIResponse>getProductsBytypes(){
         Map<String, List<ProductResponseDto>> productsBytypes = productService.getProductsBytypes();
-        return new ResponseEntity<>(productsBytypes,HttpStatus.OK);
+        APIResponse<Map<String, List<ProductResponseDto>>> responseDto = APIResponse
+                .<Map<String, List<ProductResponseDto>>>builder()
+                .status(SUCCESS)
+                .results(productsBytypes)
+                .build();
+        return new ResponseEntity<>(responseDto,HttpStatus.OK);
     }
 
 }
